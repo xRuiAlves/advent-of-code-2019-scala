@@ -1,0 +1,17 @@
+{
+  "name": "advent-of-code-2019",
+  "version": "1.0.0",
+  "description": "In this repository you can find solutions to the various daily challenges from **Advent of Code 2015**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.1-security"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2"
+  }
+}
