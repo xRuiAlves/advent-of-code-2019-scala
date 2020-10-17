@@ -4,10 +4,6 @@ import utils.FileReader
 
 import scala.collection.mutable
 
-class StepsPoint(override val x: Int, override val y: Int, val taken_steps: Int) extends Point(x, y) {
-    override def toString: String = s"[$x, $y]: $taken_steps"
-}
-
 object Day3Part2 {
     def main(args: Array[String]): Unit = {
         val file_lines : Array[String] = FileReader.readFile("src/day3/input.txt").toArray
