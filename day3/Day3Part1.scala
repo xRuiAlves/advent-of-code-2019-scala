@@ -4,18 +4,6 @@ import utils.FileReader
 
 import scala.collection.mutable
 
-class Point(val x: Int, val y: Int) {
-    override def equals(obj: Any): Boolean =
-        obj.asInstanceOf[Point].x == x &&
-        obj.asInstanceOf[Point].y == y
-
-    override def hashCode(): Int = getManhattanDistance
-
-    def getManhattanDistance : Int = math.abs(x) + math.abs(y)
-
-    override def toString: String = s"[$x, $y]"
-}
-
 object Day3Part1 {
     def main(args: Array[String]): Unit = {
         val file_lines : Array[String] = FileReader.readFile("src/day3/input.txt").toArray
