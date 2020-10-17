@@ -31,7 +31,7 @@ object Day2Part2 {
             }
         }
 
-        throw new Exception("Answer to found")
+        throw new Exception("Answer not found")
     }
 
     def getVal(idx: Int) : Int = program(idx)
