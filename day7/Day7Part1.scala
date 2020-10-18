@@ -17,12 +17,12 @@ object Day7Part1 {
         val thruster_configurations : ListBuffer[ArrayBuffer[Int]] = permutations(THRUSTER_PHASES)
 
         for (thruster_configuration <- thruster_configurations) {
-            val a_output = new ProgramRunner(program.clone(), START_INPUT_VAL, thruster_configuration(0)).run
-            val b_output = new ProgramRunner(program.clone(), a_output, thruster_configuration(1)).run
-            val c_output = new ProgramRunner(program.clone(), b_output, thruster_configuration(2)).run
-            val d_output = new ProgramRunner(program.clone(), c_output, thruster_configuration(3)).run
-            val e_output = new ProgramRunner(program.clone(), d_output, thruster_configuration(4)).run
-            max_output = math.max(max_output, e_output)
+            val oA = new ProgramRunner(program.clone(), List(thruster_configuration(0), START_INPUT_VAL)).run
+            val oB = new ProgramRunner(program.clone(), List(thruster_configuration(1), oA._2)).run
+            val oC = new ProgramRunner(program.clone(), List(thruster_configuration(2), oB._2)).run
+            val oD = new ProgramRunner(program.clone(), List(thruster_configuration(3), oC._2)).run
+            val oE = new ProgramRunner(program.clone(), List(thruster_configuration(4), oD._2)).run
+            max_output = math.max(max_output, oE._2)
         }
 
         println(max_output)

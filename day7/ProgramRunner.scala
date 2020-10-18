@@ -2,14 +2,11 @@ package day7
 
 import scala.collection.mutable
 
-class ProgramRunner(
-   program: Array[Int],
-   input_signal: Int,
-   phase_setting: Int
-) {
-    val stdin: mutable.Queue[Int] = mutable.Queue(phase_setting, input_signal)
+class ProgramRunner(program: Array[Int], initial_stdin: List[Int] = List()) {
+    val stdin: mutable.Queue[Int] = mutable.Queue(initial_stdin: _*)
     var stdout = 0
     var program_over = false
+    var program_halted = false
     var pc = 0
 
     final class Instruction(raw_instruction: Int) {
@@ -30,11 +27,17 @@ class ProgramRunner(
         99 -> 1
     )
 
-    def run: Int = {
-        while (!program_over && pc < program.length) {
+    def run: (Boolean, Int) = {
+        if (program_over) throw  new Exception("Trying to run finished program")
+
+        while (!program_over && !program_halted && pc < program.length) {
             execOperation
         }
-        stdout
+
+        if (pc >= program.length) program_over = true
+
+        program_halted = false
+        (program_over, stdout)
     }
 
     def getVal(n: Int, mode: Int): Int = if (mode == 0) program(n) else n
@@ -52,6 +55,7 @@ class ProgramRunner(
     }
 
     def output(op: Int): Unit = {
+        program_halted = true
         stdout = program(op)
     }
 
