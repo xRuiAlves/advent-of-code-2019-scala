@@ -29,5 +29,7 @@ class Planet(var pos: Coord3D) {
 
     def getEnergy: Int = pos.coords.map(math.abs).sum * speed.coords.map(math.abs).sum
 
+    def getCoordInfo(coord: Int): (Int, Int) = (pos.coords(coord), speed.coords(coord))
+
     override def toString: String = s"pos=$pos\nspeed=$speed"
 }
