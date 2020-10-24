@@ -4,11 +4,17 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class ProgramRunner(program: Array[BigInt]) {
+    final val HORIZONTAL_PADDLE_ID = 3
+    final val BALL_ID = 4
+
     val stdin: mutable.Queue[BigInt] = mutable.Queue()
     var stdout = new ArrayBuffer[Int]()
     var program_over = false
     var pc: Int = 0
     var relative_base: BigInt = 0
+    var ball_pos: (Int, Int) = (0, 0)
+    var paddle_pos: (Int, Int) = (0, 0)
+    var score = 0
 
     final class Instruction(raw_instruction: Int) {
         val opcode : Int = raw_instruction % 100
@@ -57,11 +63,29 @@ class ProgramRunner(program: Array[BigInt]) {
     }
 
     def input(arguments: ArrayBuffer[Int]): Unit = {
-        program(arguments(0)) = stdin.dequeue
+        program(arguments(0)) = math.signum(ball_pos._1 - paddle_pos._1)
     }
 
     def output(arguments: ArrayBuffer[Int]): Unit = {
         stdout += program(arguments(0)).toInt
+        if (stdout.length > 2) {
+            if (stdout(stdout.length - 3) == -1 && stdout(stdout.length - 2) == 0) {
+                score = stdout.last
+            }
+            if (stdout.length % 3 == 0) {
+                if (stdout.last == BALL_ID) {
+                    ball_pos = (
+                        stdout(stdout.length - 3),
+                        stdout(stdout.length - 2)
+                    )
+                } else if (stdout.last == HORIZONTAL_PADDLE_ID) {
+                    paddle_pos = (
+                        stdout(stdout.length - 3),
+                        stdout(stdout.length - 2)
+                    )
+                }
+            }
+        }
     }
 
     def jumpIfTrue(instruction: Instruction): Unit = {
