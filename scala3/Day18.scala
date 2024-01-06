@@ -15,7 +15,18 @@ object Day18 {
   private[this] final val StartCell = '@'
 
   def main(args: Array[String]): Unit = {
-    val map = readResourceLines("day18.txt").map(_.toCharArray)
+    val input = readResourceLines("day18.txt")
+    val t0 = System.nanoTime
+    val (part1, part2) = getSolution(input)
+    val t1 = System.nanoTime
+    val duration = (t1 - t0) / 1e6d
+    println(s"Part 1: $part1")
+    println(s"Part 2: $part2")
+    println(s"Duration: $duration ms")
+  }
+
+  def getSolution(input: Array[String]): (Int, Int) = {
+    val map = input.map(_.toCharArray)
     val start = parseStart(map)
     val numKeys = getKeys(map.flatten.toSet).size
 
@@ -23,8 +34,7 @@ object Day18 {
     val startsPart2 = updateMapForPart2(map, start)
     val part2 = bfs(map, startsPart2, numKeys)
 
-    println(s"Part 1: $part1")
-    println(s"Part 2: $part2")
+    (part1, part2)
   }
 
   def printMap(map: Mat2D): Unit = map.foreach(a => {
@@ -54,6 +64,7 @@ object Day18 {
         visited.add(curr.visitNode)
 
         if (curr.visitNode.keys.size == numKeys) {
+          progress.clear()
           return curr.depth
         }
 
