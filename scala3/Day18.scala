@@ -19,23 +19,29 @@ object Day18 {
     val start = parseStart(map)
     val numKeys = getKeys(map.flatten.toSet).size
 
-    val part1 = bfs(map, start, numKeys)
-    val part2 = 0
+    val part1 = bfs(map, Set(start), numKeys)
+    val startsPart2 = updateMapForPart2(map, start)
+    val part2 = bfs(map, startsPart2, numKeys)
 
     println(s"Part 1: $part1")
     println(s"Part 2: $part2")
   }
 
-  case class VisitNode(coord: Coord2D, keys: Set[Char])
+  def printMap(map: Mat2D): Unit = map.foreach(a => {
+    a.foreach(b => print(s"$b "))
+    println()
+  })
+
+  case class VisitNode(coords: Set[Coord2D], keys: Set[Char])
 
   case class BfsNode(visitNode: VisitNode, depth: Int)
 
   private val progress = mutable.Set[Int]()
 
-  def bfs(map: Mat2D, start: Coord2D, numKeys: Int): Int = {
+  def bfs(map: Mat2D, starts: Set[Coord2D], numKeys: Int): Int = {
     val visited = mutable.Set[VisitNode]()
     val toVisit = mutable.Queue[BfsNode]()
-    toVisit.enqueue(BfsNode(VisitNode(start, Set()), 0))
+    toVisit.enqueue(BfsNode(VisitNode(starts, Set()), 0))
 
     while (toVisit.nonEmpty) {
       val curr = toVisit.dequeue()
@@ -51,12 +57,15 @@ object Day18 {
           return curr.depth
         }
 
-        getNeighbors(map, curr.visitNode.coord).foreach(neighbor => {
-          val cell = map(neighbor._1)(neighbor._2)
-          if (!cell.isUpper || curr.visitNode.keys.contains(cell.toLower)) {
-            val keys = getKeys(curr.visitNode.keys.incl(cell))
-            toVisit.enqueue(BfsNode(VisitNode(neighbor, keys), curr.depth + 1))
-          }
+        val coords = curr.visitNode.coords
+        coords.foreach(coord => {
+          getNeighbors(map, coord).foreach(neighbor => {
+            val cell = map(neighbor._1)(neighbor._2)
+            if (!cell.isUpper || curr.visitNode.keys.contains(cell.toLower)) {
+              val keys = getKeys(curr.visitNode.keys.incl(cell))
+              toVisit.enqueue(BfsNode(VisitNode(coords - coord + neighbor, keys), curr.depth + 1))
+            }
+          })
         })
       }
     }
@@ -81,4 +90,24 @@ object Day18 {
 
   def getKeys(elems: Set[Char]): Set[Char] = elems.filter(_.isLower)
   def getDoors(elems: Set[Char]): Set[Char] = elems.filter(_.isUpper)
+
+  def updateMapForPart2(map: Mat2D, start: Coord2D): Set[Coord2D] = start match { case (i, j) =>
+    map(i - 1)(j - 1) = StartCell
+    map(i - 1)(j + 1) = StartCell
+    map(i + 1)(j - 1) = StartCell
+    map(i + 1)(j + 1) = StartCell
+
+    map(i)(j) = WallCell
+    map(i - 1)(j) = WallCell
+    map(i + 1)(j) = WallCell
+    map(i)(j - 1) = WallCell
+    map(i)(j + 1) = WallCell
+
+    Set(
+      (i - 1, j - 1),
+      (i - 1, j + 1),
+      (i + 1, j - 1),
+      (i + 1, j + 1),
+    )
+  }
 }
