@@ -18,11 +18,12 @@ object Day18 {
 
   def main(args: Array[String]): Unit = {
     val input = readResourceLines("day18.txt")
+    
     val t0 = System.nanoTime
     val (part1, part2) = getSolution(input)
     val t1 = System.nanoTime
     val duration = (t1 - t0) / 1e6d
-    println()
+    
     println(s"Part 1: $part1")
     println(s"Part 2: $part2")
     println(s"Duration: $duration ms")
