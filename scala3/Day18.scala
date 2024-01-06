@@ -36,16 +36,16 @@ object Day18 {
       .map(getKeyId)
       .foldLeft(0)(getUpdatedKeys)
 
-    val part1 = 0
+    val part1 = bfs(map, Array(start), targetKeys)
     val startsPart2 = updateMapForPart2(map, start)
     val part2 = bfs(map, startsPart2, targetKeys)
 
     (part1, part2)
   }
 
-  case class VisitNode(coord: Coord2D, keys: Keys, depth: Int)
+  case class VisitNode(coord: Coord2D, keys: Keys)
 
-  case class BfsNode(coords: Array[Coord2D], keys: Keys, depth: Int, prev: Array[BfsNode] = Array.empty[BfsNode])
+  case class BfsNode(coords: Array[Coord2D], keys: Keys, depth: Int)
 
   def bfs(map: Mat2D, starts: Array[Coord2D], targetKeys: Keys): Int = {
     val visited = starts.map(_ => mutable.Set[VisitNode]())
@@ -60,8 +60,8 @@ object Day18 {
       }
 
       curr.coords.zipWithIndex.foreach { case (coord, i) =>
-        if (!visited(i).contains(VisitNode(coord, curr.keys, curr.depth - 2))) {
-          visited(i).addOne(VisitNode(coord, curr.keys, curr.depth))
+        if (!visited(i).contains(VisitNode(coord, curr.keys))) {
+          visited(i).addOne(VisitNode(coord, curr.keys))
 
           getNeighbors(map, coord).foreach(neighbor => {
             val cell = map(neighbor._1)(neighbor._2)
@@ -69,8 +69,15 @@ object Day18 {
               if (cell.isLower) getUpdatedKeys(curr.keys, getKeyId(cell))
               else curr.keys
 
-            if (cell.isLower || cell == EmptyCell || (cell.isUpper && canOpenDoor(curr.keys, cell))) {
-              toVisit.enqueue(BfsNode(curr.coords.updated(i, neighbor), keys, curr.depth + 1, curr.prev.appended(curr)))
+            if (
+              cell.isLower || cell == EmptyCell || (cell.isUpper && canOpenDoor(
+                curr.keys,
+                cell
+              ))
+            ) {
+              toVisit.enqueue(
+                BfsNode(curr.coords.updated(i, neighbor), keys, curr.depth + 1)
+              )
             }
           })
         }
@@ -80,10 +87,11 @@ object Day18 {
     throw new Error("Solution not found!")
   }
 
-  def getNeighbors(map: Mat2D, coord: Coord2D): Array[Coord2D] = coord match { case (i, j) =>
-    Array((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1))
-      .filter(coord => isInBounds(map, coord))
-      .filter { case(i, j) => map(i)(j) != WallCell }
+  def getNeighbors(map: Mat2D, coord: Coord2D): Array[Coord2D] = coord match {
+    case (i, j) =>
+      Array((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1))
+        .filter(coord => isInBounds(map, coord))
+        .filter { case (i, j) => map(i)(j) != WallCell }
   }
 
   def isInBounds(map: Mat2D, coord: Coord2D): Boolean = coord match
@@ -99,25 +107,28 @@ object Day18 {
 
   def getKeyId(key: Char): Int = 1 << (key - 'a')
 
-  def canOpenDoor(keys: Keys, door: Char): Boolean = (keys & getKeyId(door.toLower)) != 0
+  def canOpenDoor(keys: Keys, door: Char): Boolean =
+    (keys & getKeyId(door.toLower)) != 0
 
-  def updateMapForPart2(map: Mat2D, start: Coord2D): Array[Coord2D] = start match { case (i, j) =>
-    map(i - 1)(j - 1) = EmptyCell
-    map(i - 1)(j + 1) = EmptyCell
-    map(i + 1)(j - 1) = EmptyCell
-    map(i + 1)(j + 1) = EmptyCell
+  def updateMapForPart2(map: Mat2D, start: Coord2D): Array[Coord2D] =
+    start match {
+      case (i, j) =>
+        map(i - 1)(j - 1) = EmptyCell
+        map(i - 1)(j + 1) = EmptyCell
+        map(i + 1)(j - 1) = EmptyCell
+        map(i + 1)(j + 1) = EmptyCell
 
-    map(i)(j) = WallCell
-    map(i - 1)(j) = WallCell
-    map(i + 1)(j) = WallCell
-    map(i)(j - 1) = WallCell
-    map(i)(j + 1) = WallCell
+        map(i)(j) = WallCell
+        map(i - 1)(j) = WallCell
+        map(i + 1)(j) = WallCell
+        map(i)(j - 1) = WallCell
+        map(i)(j + 1) = WallCell
 
-    Array(
-      (i - 1, j - 1),
-      (i - 1, j + 1),
-      (i + 1, j - 1),
-      (i + 1, j + 1),
-    )
-  }
+        Array(
+          (i - 1, j - 1),
+          (i - 1, j + 1),
+          (i + 1, j - 1),
+          (i + 1, j + 1)
+        )
+    }
 }
